@@ -7,6 +7,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  Suspense,
 } from "react";
 
 import {
@@ -115,7 +116,7 @@ const initialComponente: ComponenteForm = {
 };
 
 
-export default function NuevoActivoPage() {
+function NuevoActivoPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -2374,5 +2375,22 @@ export default function NuevoActivoPage() {
       )}
 
     </div>
+  );
+}
+
+
+export default function NuevoActivoContent() {
+  return (
+    <Suspense
+      fallback={
+        <div className="p-4 sm:p-6 lg:p-8">
+          <p className="text-sm text-slate-500">
+            Cargando formulario...
+          </p>
+        </div>
+      }
+    >
+      <NuevoActivoContent />
+    </Suspense>
   );
 }
