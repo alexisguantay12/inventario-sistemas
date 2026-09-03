@@ -116,7 +116,7 @@ const initialComponente: ComponenteForm = {
 };
 
 
-function NuevoActivoPage() {
+function NuevoActivoContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -2379,7 +2379,7 @@ function NuevoActivoPage() {
 }
 
 
-export default function NuevoActivoContent() {
+export default function NuevoActivoPage() {
   return (
     <Suspense
       fallback={
