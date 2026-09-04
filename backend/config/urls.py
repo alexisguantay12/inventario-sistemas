@@ -25,6 +25,10 @@ urlpatterns = [
             "apps.operaciones.urls"
         ),
     ),
+    path(
+        "api/auth/",
+        include("apps.core.urls"),
+    ),
 ]
 
 

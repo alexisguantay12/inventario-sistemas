@@ -1,0 +1,22 @@
+{
+  "name": "Inventario Sistemas",
+  "short_name": "Inventario",
+  "description": "Sistema de gestión de inventario e infraestructura informática del Hospital Privado Santa Clara de Asís",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#0ea5e9",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo-santa-clara.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/logo-santa-clara.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

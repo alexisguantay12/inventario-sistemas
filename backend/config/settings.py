@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "corsheaders",
 
     # Sistema de Inventario
+    "apps.core",
     "apps.estructura",
     "apps.inventario",
     "apps.operaciones",
@@ -319,3 +320,19 @@ if USE_HTTPS:
         "HTTP_X_FORWARDED_PROTO",
         "https",
     )
+
+# ============================================================
+# DJANGO REST FRAMEWORK
+# ============================================================
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+}
+
+
+CORS_ALLOW_CREDENTIALS = True
