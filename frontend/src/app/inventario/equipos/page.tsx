@@ -32,6 +32,134 @@ type EquipoForm = {
   observaciones: string;
 };
 
+async function comprimirImagen(
+  file: File,
+): Promise<File> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const img = new Image();
+
+      img.onload = () => {
+        const MAX_WIDTH = 1600;
+        const MAX_HEIGHT = 1600;
+
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_WIDTH) {
+          height =
+            Math.round(
+              height *
+              (MAX_WIDTH / width),
+            );
+
+          width =
+            MAX_WIDTH;
+        }
+
+        if (height > MAX_HEIGHT) {
+          width =
+            Math.round(
+              width *
+              (MAX_HEIGHT / height),
+            );
+
+          height =
+            MAX_HEIGHT;
+        }
+
+        const canvas =
+          document.createElement(
+            "canvas",
+          );
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx =
+          canvas.getContext("2d");
+
+        if (!ctx) {
+          reject(
+            new Error(
+              "No se pudo procesar la imagen.",
+            ),
+          );
+
+          return;
+        }
+
+        ctx.drawImage(
+          img,
+          0,
+          0,
+          width,
+          height,
+        );
+
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(
+                new Error(
+                  "No se pudo comprimir la imagen.",
+                ),
+              );
+
+              return;
+            }
+
+            const nombreBase =
+              file.name.replace(
+                /\.[^/.]+$/,
+                "",
+              );
+
+            const archivoComprimido =
+              new File(
+                [blob],
+                `${nombreBase}.jpg`,
+                {
+                  type: "image/jpeg",
+                  lastModified:
+                    Date.now(),
+                },
+              );
+
+            resolve(
+              archivoComprimido,
+            );
+          },
+          "image/jpeg",
+          0.82,
+        );
+      };
+
+      img.onerror = () => {
+        reject(
+          new Error(
+            "No se pudo leer la imagen.",
+          ),
+        );
+      };
+
+      img.src =
+        reader.result as string;
+    };
+
+    reader.onerror = () => {
+      reject(
+        new Error(
+          "No se pudo leer el archivo.",
+        ),
+      );
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
 
 const initialForm: EquipoForm = {
   sector: "",
@@ -324,17 +452,12 @@ export default function EquiposPage() {
   /* ============================================================
      FOTO
   ============================================================ */
-
-  function handleFotoChange(
+  async function handleFotoChange(
     event: ChangeEvent<HTMLInputElement>,
   ) {
     const file =
       event.target.files?.[0];
 
-    /*
-     * Permitimos volver a seleccionar incluso
-     * la misma fotografía posteriormente.
-     */
     event.target.value = "";
 
     if (!file) {
@@ -351,34 +474,49 @@ export default function EquiposPage() {
       return;
     }
 
-    if (
-      file.size >
-      5 * 1024 * 1024
-    ) {
-      setError(
-        "La imagen no puede superar los 5 MB.",
+    try {
+      setError(null);
+
+      const fotoComprimida =
+        await comprimirImagen(
+          file,
+        );
+
+      setFoto(
+        fotoComprimida,
       );
 
-      return;
+      setRemoveFoto(
+        false,
+      );
+
+      setFotoPreview(
+        (previewAnterior) => {
+          if (
+            previewAnterior &&
+            previewAnterior.startsWith(
+              "blob:",
+            )
+          ) {
+            URL.revokeObjectURL(
+              previewAnterior,
+            );
+          }
+
+          return URL.createObjectURL(
+            fotoComprimida,
+          );
+        },
+      );
+    } catch (error) {
+      console.error(
+        error,
+      );
+
+      setError(
+        "No se pudo procesar la imagen.",
+      );
     }
-
-    setError(null);
-
-    setFoto(file);
-    setRemoveFoto(false);
-
-    setFotoPreview((previewAnterior) => {
-      if (
-        previewAnterior &&
-        previewAnterior.startsWith("blob:")
-      ) {
-        URL.revokeObjectURL(
-          previewAnterior,
-        );
-      }
-
-      return URL.createObjectURL(file);
-    });
   }
 
 
@@ -2311,7 +2449,7 @@ export default function EquiposPage() {
 
 
                       <p className="mt-3 text-center text-[11px] text-slate-400">
-                        JPG, PNG u otra imagen · Máximo 5 MB
+                        JPG, PNG u otra imagen · Máximo 15 MB
                       </p>
 
                     </div>
