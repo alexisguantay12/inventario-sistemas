@@ -119,6 +119,28 @@ CSRF_TRUSTED_ORIGINS = [
 
 
 # ============================================================
+# COOKIES / SESIONES
+# ============================================================
+
+SESSION_COOKIE_SECURE = (
+    os.getenv(
+        "SESSION_COOKIE_SECURE",
+        "False",
+    ).lower()
+    == "true"
+)
+
+
+CSRF_COOKIE_SECURE = (
+    os.getenv(
+        "CSRF_COOKIE_SECURE",
+        "False",
+    ).lower()
+    == "true"
+)
+
+
+# ============================================================
 # URLS / TEMPLATES
 # ============================================================
 
@@ -271,18 +293,29 @@ DEFAULT_AUTO_FIELD = (
 
 
 # ============================================================
-# PRODUCCIÓN / HTTPS
+# SEGURIDAD GENERAL
 # ============================================================
 
-if not DEBUG:
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+X_FRAME_OPTIONS = "DENY"
+
+
+# ============================================================
+# HTTPS / PROXY
+# ============================================================
+
+USE_HTTPS = (
+    os.getenv(
+        "DJANGO_USE_HTTPS",
+        "False",
+    ).lower()
+    == "true"
+)
+
+
+if USE_HTTPS:
     SECURE_PROXY_SSL_HEADER = (
         "HTTP_X_FORWARDED_PROTO",
         "https",
     )
-
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-
-    X_FRAME_OPTIONS = "DENY"
