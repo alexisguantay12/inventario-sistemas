@@ -208,6 +208,33 @@ function estadoActivoClasses(
 }
 
 
+const API_BASE_URL =
+  (
+    process.env.NEXT_PUBLIC_API_URL ??
+    "/api"
+  ).replace(/\/api\/?$/, "");
+
+
+function obtenerUrlFoto(
+  foto: string | null,
+): string | null {
+  if (!foto) {
+    return null;
+  }
+
+  if (
+    foto.startsWith("http://") ||
+    foto.startsWith("https://") ||
+    foto.startsWith("blob:")
+  ) {
+    return foto;
+  }
+
+  return `${API_BASE_URL}${foto}`;
+}
+
+
+
 export default function EquipoDetallePage() {
   const params = useParams();
 
@@ -403,7 +430,11 @@ export default function EquipoDetallePage() {
     });
 
     setFoto(null);
-    setFotoPreview(equipo.foto);
+    setFotoPreview(
+      obtenerUrlFoto(
+        equipo.foto,
+      ),
+    );
     setRemoveFoto(false);
     setErrorEdicion(null);
 
@@ -1322,7 +1353,11 @@ export default function EquipoDetallePage() {
 
 
                   <img
-                    src={equipo.foto}
+                    src={
+                      obtenerUrlFoto(
+                        equipo.foto,
+                      ) ?? ""
+                    }
                     alt={equipo.nombre}
                     className="aspect-[4/3] w-full object-cover"
                   />
