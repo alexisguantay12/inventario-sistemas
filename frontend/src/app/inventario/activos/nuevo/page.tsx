@@ -987,6 +987,13 @@ function NuevoActivoContent() {
               .trim()
               .toUpperCase()
           : "",
+      mac_address:
+        permiteMac
+          ? form.mac_address
+              .trim()
+              .toUpperCase()
+              .replace(/-/g, ":")
+          : "",
 
       sistema_operativo:
         permiteSistemaOperativo &&

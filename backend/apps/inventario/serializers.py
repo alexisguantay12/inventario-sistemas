@@ -217,7 +217,7 @@ class EquipoTrabajoSerializer(serializers.ModelSerializer):
             )
         )
 
-        total_gb = 0
+        total_gb = 0.0
 
         for componente in componentes_ram:
             valor = componente.capacidad_valor

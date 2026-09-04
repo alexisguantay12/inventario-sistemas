@@ -158,12 +158,14 @@ class TipoActivoAdmin(admin.ModelAdmin):
         "prefijo",
         "activo",
         "tiene_sistema_operativo",
+        "tiene_mac",
         "cantidad_activos",
     )
 
     list_filter = (
         "activo",
         "tiene_sistema_operativo",
+        "tiene_mac",
     )
 
     search_fields = (
@@ -193,11 +195,13 @@ class TipoActivoAdmin(admin.ModelAdmin):
             {
                 "fields": (
                     "tiene_sistema_operativo",
+                    "tiene_mac",
                 ),
                 "description": (
-                    "Marcá esta opción si los activos de este tipo "
-                    "pueden tener sistema operativo. "
-                    "Ej.: CPU, notebook o servidor."
+                    "Configurá las capacidades técnicas de este tipo de activo. "
+                    "Ej.: CPU o notebook pueden tener sistema operativo y MAC; "
+                    "una impresora o switch puede tener MAC aunque no use "
+                    "sistema operativo."
                 ),
             },
         ),

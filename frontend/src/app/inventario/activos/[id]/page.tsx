@@ -1584,14 +1584,23 @@ export default function ActivoDetallePage() {
                     mono
                   />
                 )}
-                {activo.mac_address && (
-                  <InfoCard
-                    titulo="Dirección MAC"
-                    valor={
-                      activo.mac_address
-                    }
-                    mono
-                  />
+                {activo.equipo_trabajo_nombre && (
+
+                  <div className="rounded-xl border border-slate-100 bg-white/90 p-3 shadow-sm">
+
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                      Equipo de trabajo
+                    </p>
+
+                    <Link
+                      href={`/inventario/equipos/${activo.equipo_trabajo}`}
+                      className="mt-1.5 block text-sm font-semibold text-sky-700 hover:text-sky-800"
+                    >
+                      {activo.equipo_trabajo_nombre}
+                    </Link>
+
+                  </div>
+
                 )}
 
                 {activo.sistema_operativo_nombre && (
@@ -1614,7 +1623,16 @@ export default function ActivoDetallePage() {
                   />
                 )}
 
-
+                
+                {activo.mac_address && (
+                  <InfoCard
+                    titulo="Dirección MAC"
+                    valor={
+                      activo.mac_address
+                    }
+                    mono
+                  />
+                )}
                 {fechaAdquisicion && (
                   <InfoCard
                     titulo="Adquisición"
@@ -1625,24 +1643,7 @@ export default function ActivoDetallePage() {
                 )}
 
 
-                {activo.equipo_trabajo_nombre && (
-
-                  <div className="rounded-xl border border-slate-100 bg-white/90 p-3 shadow-sm">
-
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-                      Equipo de trabajo
-                    </p>
-
-                    <Link
-                      href={`/inventario/equipos/${activo.equipo_trabajo}`}
-                      className="mt-1.5 block text-sm font-semibold text-sky-700 hover:text-sky-800"
-                    >
-                      {activo.equipo_trabajo_nombre}
-                    </Link>
-
-                  </div>
-
-                )}
+                
 
 
                 {!activo.equipo_trabajo &&
