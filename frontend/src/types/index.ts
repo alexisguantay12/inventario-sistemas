@@ -44,6 +44,7 @@ export interface TipoActivo {
 
   // NUEVO
   tiene_sistema_operativo: boolean;
+  tiene_mac: boolean;
 }
 
 
@@ -68,12 +69,13 @@ export interface Activo {
   numero_serie: string;
 
   hostname: string;
-
+  tiene_mac: boolean;
+  tipo_activo_tiene_mac?: boolean;
   // NUEVO
   sistema_operativo: string;
   sistema_operativo_nombre: string;
   fecha_adquisicion: string | null;
-
+  mac_address?: string | null;
   estado:
     | "EN_USO"
     | "DISPONIBLE"

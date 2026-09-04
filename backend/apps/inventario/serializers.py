@@ -42,6 +42,7 @@ class TipoActivoSerializer(serializers.ModelSerializer):
             "prefijo",
             "descripcion",
             "activo",
+            "tiene_mac",
             "tiene_sistema_operativo",
         ]
 
@@ -253,7 +254,7 @@ class ComponenteInlineSerializer(serializers.ModelSerializer):
         source="tipo_componente.nombre",
         read_only=True,
     )
-
+    
     class Meta:
         model = Componente
 
@@ -356,7 +357,10 @@ class ActivoSerializer(serializers.ModelSerializer):
         read_only=True,
         allow_null=True,
     )
-
+    tipo_activo_tiene_mac = serializers.BooleanField(
+        source="tipo_activo.tiene_mac",
+        read_only=True,
+    )
     class Meta:
         model = Activo
 
@@ -381,6 +385,8 @@ class ActivoSerializer(serializers.ModelSerializer):
             "hostname",
             "sistema_operativo",
             "sistema_operativo_nombre",
+            "mac_address",
+            "tipo_activo_tiene_mac",
 
             "fecha_adquisicion",
             "estado",
@@ -402,6 +408,7 @@ class ActivoSerializer(serializers.ModelSerializer):
             "area_nombre",
             "equipo_trabajo_nombre",
             "sistema_operativo_nombre",
+            "tipo_activo_tiene_mac",
             "cantidad_componentes",
 
             "created_at",
@@ -506,6 +513,48 @@ class ActivoSerializer(serializers.ModelSerializer):
             )
 
 
+        # --------------------------------------------------------
+        # DIRECCIÓN MAC
+        # --------------------------------------------------------
+
+        mac_address = attrs.get(
+            "mac_address",
+            getattr(
+                self.instance,
+                "mac_address",
+                "",
+            ),
+        )
+
+        if mac_address:
+            mac_normalizada = (
+                mac_address
+                .strip()
+                .upper()
+                .replace("-", ":")
+            )
+
+            attrs["mac_address"] = (
+                mac_normalizada
+            )
+
+            mac_address = (
+                mac_normalizada
+            )
+
+        if (
+            mac_address
+            and tipo_activo
+            and not tipo_activo.tiene_mac
+        ):
+            raise serializers.ValidationError(
+                {
+                    "mac_address": (
+                        "Este tipo de activo no admite "
+                        "dirección MAC."
+                    )
+                }
+            )
         # --------------------------------------------------------
         # COMPONENTES / TIPO DE ACTIVO
         # --------------------------------------------------------

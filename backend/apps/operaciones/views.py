@@ -677,6 +677,14 @@ class OperacionActivoViewSet(
                             "",
                         )
                     ),
+                    mac_address=(
+                        serializer
+                        .validated_data
+                        .get(
+                            "mac_address",
+                            "",
+                        )
+                    ),
 
                     sistema_operativo_id=(
                         serializer

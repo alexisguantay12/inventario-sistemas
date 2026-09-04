@@ -164,7 +164,11 @@ class TipoActivo(BaseAbstractWithUser):
             "Ej.: CPU, notebook o servidor."
         ),
     )
-
+    tiene_mac = models.BooleanField(
+        default=False,
+        verbose_name="Tiene dirección MAC",
+    )
+    
     class Meta:
         verbose_name = "Tipo de activo"
         verbose_name_plural = "Tipos de activo"
@@ -208,6 +212,14 @@ class Activo(BaseAbstractWithUser):
         blank=True,
         null=True,
         verbose_name="sector",
+    )
+
+    mac_address = models.CharField(
+        max_length=17,
+        blank=True,
+        null=True,
+        verbose_name="Dirección MAC",
+        help_text="Dirección MAC de la interfaz de red principal.",
     )
 
     equipo_trabajo = models.ForeignKey(

@@ -1953,12 +1953,12 @@ def retornar_activo_reparacion_stock(
 # ACTUALIZAR CONFIGURACIÓN DEL ACTIVO
 # ============================================================
 
-
 @transaction.atomic
 def actualizar_configuracion_activo(
     *,
     activo_id,
     hostname,
+    mac_address,
     sistema_operativo_id,
     user,
 ):
@@ -1967,9 +1967,11 @@ def actualizar_configuracion_activo(
     que pueden cambiar durante la vida útil del activo:
 
         - hostname
+        - dirección MAC
         - sistema operativo
 
     No modifica:
+
         - estado
         - sector
         - equipo de trabajo
@@ -1985,7 +1987,6 @@ def actualizar_configuracion_activo(
         )
     )
 
-
     if (
         activo.estado
         == EstadoActivo.BAJA
@@ -1995,13 +1996,16 @@ def actualizar_configuracion_activo(
             "de un activo dado de baja."
         )
 
-
     # --------------------------------------------------------
     # VALORES ANTERIORES
     # --------------------------------------------------------
 
     hostname_anterior = (
         activo.hostname or ""
+    )
+
+    mac_anterior = (
+        activo.mac_address or ""
     )
 
     sistema_operativo_anterior = (
@@ -2018,13 +2022,43 @@ def actualizar_configuracion_activo(
         else ""
     )
 
+    # --------------------------------------------------------
+    # NORMALIZAR HOSTNAME
+    # --------------------------------------------------------
+
+    hostname_nuevo = (
+        hostname or ""
+    ).strip().upper()
+
+    # --------------------------------------------------------
+    # NORMALIZAR MAC
+    # --------------------------------------------------------
+
+    mac_nueva = (
+        mac_address or ""
+    ).strip().upper().replace(
+        "-",
+        ":",
+    )
+
+    # --------------------------------------------------------
+    # VALIDAR MAC SEGÚN TIPO DE ACTIVO
+    # --------------------------------------------------------
+
+    if (
+        mac_nueva
+        and not activo.tipo_activo.tiene_mac
+    ):
+        raise ValidationError(
+            "Este tipo de activo no admite "
+            "dirección MAC."
+        )
 
     # --------------------------------------------------------
     # RESOLVER NUEVO SISTEMA OPERATIVO
     # --------------------------------------------------------
 
     sistema_operativo_nuevo = None
-
 
     if sistema_operativo_id:
         modelo_so = (
@@ -2042,13 +2076,20 @@ def actualizar_configuracion_activo(
                     pk=sistema_operativo_id
                 )
             )
-
         except modelo_so.DoesNotExist:
             raise ValidationError(
                 "El sistema operativo seleccionado "
                 "no existe."
             )
 
+    if (
+        sistema_operativo_nuevo
+        and not activo.tipo_activo.tiene_sistema_operativo
+    ):
+        raise ValidationError(
+            "Este tipo de activo no admite "
+            "sistema operativo."
+        )
 
     sistema_operativo_nuevo_nombre = (
         getattr(
@@ -2060,18 +2101,11 @@ def actualizar_configuracion_activo(
         else ""
     )
 
-
-    hostname_nuevo = (
-        hostname or ""
-    ).strip()
-
-
     # --------------------------------------------------------
     # DETECTAR CAMBIOS
     # --------------------------------------------------------
 
     cambios = []
-
 
     if (
         hostname_anterior
@@ -2084,6 +2118,16 @@ def actualizar_configuracion_activo(
             f"{hostname_nuevo or 'Sin hostname'}"
         )
 
+    if (
+        mac_anterior
+        != mac_nueva
+    ):
+        cambios.append(
+            "MAC: "
+            f"{mac_anterior or 'Sin MAC'} "
+            "→ "
+            f"{mac_nueva or 'Sin MAC'}"
+        )
 
     sistema_operativo_anterior_id = (
         sistema_operativo_anterior.id
@@ -2091,13 +2135,11 @@ def actualizar_configuracion_activo(
         else None
     )
 
-
     sistema_operativo_nuevo_id = (
         sistema_operativo_nuevo.id
         if sistema_operativo_nuevo
         else None
     )
-
 
     if (
         sistema_operativo_anterior_id
@@ -2110,12 +2152,10 @@ def actualizar_configuracion_activo(
             f"{sistema_operativo_nuevo_nombre or 'Sin sistema operativo'}"
         )
 
-
     if not cambios:
         raise ValidationError(
             "No se detectaron cambios en la configuración."
         )
-
 
     # --------------------------------------------------------
     # SITUACIÓN ACTUAL
@@ -2137,7 +2177,6 @@ def actualizar_configuracion_activo(
         activo.estado
     )
 
-
     # --------------------------------------------------------
     # ACTUALIZAR ACTIVO
     # --------------------------------------------------------
@@ -2146,20 +2185,23 @@ def actualizar_configuracion_activo(
         hostname_nuevo
     )
 
+    activo.mac_address = (
+        mac_nueva
+    )
+
     activo.sistema_operativo = (
         sistema_operativo_nuevo
     )
-
 
     _guardar_activo(
         activo,
         user=user,
         campos=[
             "hostname",
+            "mac_address",
             "sistema_operativo",
         ],
     )
-
 
     # --------------------------------------------------------
     # REGISTRAR HISTORIAL
@@ -2204,13 +2246,7 @@ def actualizar_configuracion_activo(
         ),
     )
 
-
     return activo
-
-
-
-
-
 
 
 # ============================================================

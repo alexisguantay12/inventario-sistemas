@@ -444,6 +444,11 @@ export default function ActivoDetallePage() {
   ] = useState("");
 
   const [
+    macAddressConfiguracion,
+    setMacAddressConfiguracion,
+  ] = useState("");
+  
+  const [
     sistemaOperativoId,
     setSistemaOperativoId,
   ] = useState("");
@@ -857,7 +862,9 @@ export default function ActivoDetallePage() {
       setHostnameConfiguracion(
         activo?.hostname ?? "",
       );
-
+      setMacAddressConfiguracion(
+        activo?.mac_address ?? "",
+      );
       setSistemaOperativoId(
         activo?.sistema_operativo
           ? String(
@@ -975,7 +982,16 @@ export default function ActivoDetallePage() {
         `/operaciones/activos/${activo.id}/actualizar-configuracion/`,
         {
           hostname:
-            hostnameConfiguracion.trim(),
+            hostnameConfiguracion
+              .trim()
+              .toUpperCase(),
+
+          mac_address:
+            activo.tipo_activo_tiene_mac
+              ? macAddressConfiguracion
+                  .trim()
+                  .toUpperCase()
+              : "",
 
           sistema_operativo_id:
             sistemaOperativoId
@@ -1568,7 +1584,15 @@ export default function ActivoDetallePage() {
                     mono
                   />
                 )}
-
+                {activo.mac_address && (
+                  <InfoCard
+                    titulo="Dirección MAC"
+                    valor={
+                      activo.mac_address
+                    }
+                    mono
+                  />
+                )}
 
                 {activo.sistema_operativo_nombre && (
                   <InfoCard
@@ -2341,7 +2365,40 @@ export default function ActivoDetallePage() {
                 )}
 
               </div>
+               {activo.tipo_activo_tiene_mac && (
 
+                <div className="mt-5">
+
+                  <label className="text-sm font-semibold text-slate-700">
+                    Dirección MAC
+                  </label>
+
+                  <input
+                    type="text"
+                    value={
+                      macAddressConfiguracion
+                    }
+                    disabled={
+                      operandoActivo
+                    }
+                    onChange={(event) =>
+                      setMacAddressConfiguracion(
+                        event.target.value,
+                      )
+                    }
+                    placeholder="AA:BB:CC:DD:EE:FF"
+                    spellCheck={false}
+                    maxLength={17}
+                    className="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-3 font-mono text-base uppercase text-slate-800 outline-none transition placeholder:font-sans placeholder:text-slate-400 focus:border-sky-500 focus:ring-2 focus:ring-sky-100 disabled:bg-slate-50 sm:text-sm"
+                  />
+
+                  <p className="mt-1.5 text-xs text-slate-400">
+                    Dirección física de la interfaz de red principal.
+                  </p>
+
+                </div>
+
+              )} 
 
               <div className="mt-5 rounded-xl border border-sky-100 bg-sky-50/70 p-4">
 

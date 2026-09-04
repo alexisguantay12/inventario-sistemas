@@ -77,6 +77,7 @@ type ActivoForm = {
   marca: string;
   modelo: string;
   hostname: string;
+  mac_address: string;
   sistema_operativo: string;
   fecha_adquisicion: string;
   estado: string;
@@ -100,6 +101,7 @@ const initialForm: ActivoForm = {
   marca: "",
   modelo: "",
   hostname: "",
+  mac_address: "",
   sistema_operativo: "",
   fecha_adquisicion:
     FECHA_ADQUISICION_DEFAULT,
@@ -497,7 +499,11 @@ function NuevoActivoContent() {
       tipoSeleccionado
         ?.tiene_sistema_operativo,
     );
-
+  const permiteMac =
+    Boolean(
+      tipoSeleccionado
+        ?.tiene_mac,
+    );  
 
   const tipoComponenteModal =
     useMemo(() => {
@@ -617,6 +623,7 @@ function NuevoActivoContent() {
         marca: "",
         modelo: "",
         hostname: "",
+        mac_address: "",
         sistema_operativo: "",
       }),
     );
@@ -1664,7 +1671,41 @@ function NuevoActivoContent() {
 
                 </>
               )}
+              {form.tipo_activo &&
+                permiteMac && (
 
+                <div>
+
+                  <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+                    Dirección MAC
+                  </label>
+
+                  <input
+                    type="text"
+                    value={
+                      form.mac_address
+                    }
+                    onChange={(
+                      event,
+                    ) =>
+                      handleChange(
+                        "mac_address",
+                        event.target.value,
+                      )
+                    }
+                    placeholder="AA:BB:CC:DD:EE:FF"
+                    spellCheck={false}
+                    maxLength={17}
+                    className="w-full rounded-xl border border-slate-300 bg-slate-50/60 px-3 py-3 font-mono text-base uppercase text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-sky-400 focus:bg-white focus:ring-4 focus:ring-sky-100 sm:text-sm"
+                  />
+
+                  <p className="mt-1.5 text-xs text-slate-400">
+                    Dirección física de la interfaz de red principal.
+                  </p>
+
+                </div>
+
+              )}
 
               {form.tipo_activo &&
                 !loadingComponentes &&

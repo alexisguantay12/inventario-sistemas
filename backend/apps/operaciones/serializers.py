@@ -384,3 +384,8 @@ class ActualizarConfiguracionActivoSerializer(
             min_value=1,
         )
     )
+    mac_address = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=17,
+    )
